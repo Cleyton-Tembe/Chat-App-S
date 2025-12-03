@@ -16,6 +16,8 @@ const SideBar = () => {
     ? users.filter((user) => onlineUsers.includes(user._id))
     : users;
 
+    console.log("user array:"+ filteredUsers)
+
     useEffect(()=> {
         getUsers()
     }, [getUsers])
@@ -45,7 +47,7 @@ const SideBar = () => {
       </div>
 
       <div className="overflow-y-auto w-full py-3">
-        {filteredUsers.map((user) => (
+        {filteredUsers?.map((user) => (
           <button
             key={user._id}
             onClick={() => {

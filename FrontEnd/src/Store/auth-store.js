@@ -2,7 +2,9 @@ import { create } from "zustand";
 import { io } from 'socket.io-client'
 import { axiosInstance } from "../Utils/axios";
 import toast from "react-hot-toast";
-import { Navigate } from "react-router-dom";
+
+
+const BASE_URL = import.meta.env.NODE_ENV === "development" ? "http://localhost:4000" : "/";
 
 const useAuthStore = create((set, get) => ({
     authUser: null,
@@ -73,7 +75,7 @@ const useAuthStore = create((set, get) => ({
 
         try {
 
-            const response = await axiosInstance.post('auth/login', data)
+            const response = await axiosInstance.post('/auth/login', data)
           
             set({authUser: response.data})
             toast.success('You Logged with success!')
@@ -113,7 +115,7 @@ const useAuthStore = create((set, get) => ({
         
         if(!authUser || get().socket?.connected) return;
 
-        const socket = io("http://localhost:4000", {
+        const socket = io(BASE_URL, {
             query: {
                 userId: authUser._id,
             },

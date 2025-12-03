@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import path from 'path'
 import cookieParser from 'cookie-parser'
 import { ConnectDB } from '../Config/db.js'
 import authRoute  from '../Routes/auth-route.js'
@@ -11,6 +12,7 @@ import { app, server} from '../Utils/sockes.js'
 dotenv.config()
 
 const port = process.env.PORT || 4000
+const __dirname = path.resolve()
 
 app.use(cors({
     origin: "http://localhost:5173",
@@ -25,6 +27,14 @@ app.use("/api/auth", authRoute)
 app.use("/api/users", userRoute)
 app.use("/api/messages", messgaRoute)
 
+if(process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, "../../../FrontEnd/dist")))
+
+    app.get((req, res) => {
+        res.sendFile(path.join(__dirname, "../../../FrontEnd", "dist", "index.html"))
+    })
+    
+}
 
 
 
