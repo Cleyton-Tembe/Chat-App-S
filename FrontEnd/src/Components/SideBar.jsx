@@ -11,12 +11,9 @@ const SideBar = () => {
     const { onlineUsers } = useAuthStore()
     const [showOnlineOnly, setShowOnlineOnly] = useState(false)
 
-
     const filteredUsers = showOnlineOnly
     ? users.filter((user) => onlineUsers.includes(user._id))
     : users;
-
-    console.log("user array:"+ filteredUsers)
 
     useEffect(()=> {
         getUsers()

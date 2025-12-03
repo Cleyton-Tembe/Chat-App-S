@@ -125,7 +125,7 @@ const useAuthStore = create((set, get) => ({
         set({socket: socket})
 
         socket.on("getOnlineUsers", (usersId) => {
-            set({onlineUsers:usersId})
+            set({onlineUsers:[...usersId]})
         })
     },
 
