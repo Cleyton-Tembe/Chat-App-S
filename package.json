@@ -1,0 +1,14 @@
+{
+  "name": "chat-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm install --prefix BackEnd && npm install --prefix FrontEnd && npm run build --prefix FrontEnd",
+    "start": "npm run start --prefix BackEnd"
+  },
+  "keywords": [],
+  "author": "Cleyton Samuel Tembe",
+  "license": "ISC",
+  "description": "A real Time Chat app very simple"
+}
