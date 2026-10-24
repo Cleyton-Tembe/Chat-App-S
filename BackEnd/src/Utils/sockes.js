@@ -12,10 +12,10 @@ const io = new Server(server, {
 });
 
 function getReceiversSocketsId(userId) {
-  return useSocketMap[userId];
+  return useSocketMap.get(String(userId));
 }
 
-const useSocketMap = {};
+const useSocketMap = new Map();
 
 io.on("connection", (socket) => {
   console.log("A user connected", socket.id);
@@ -23,16 +23,16 @@ io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
 
   if (userId) {
-    useSocketMap[userId] = socket.id;
-    io.emit("getOnlineUsers", Object.keys(useSocketMap));
+    useSocketMap.set(userId, socket.id);
+    io.emit("getOnlineUsers", [...useSocketMap.keys()]);
   }
 
   socket.on("disconnect", () => {
-    console.log("Bro just rage quit", socket.id);
-
-    delete useSocketMap[userId];
-
-    io.emit("getOnlineUsers", Object.keys(useSocketMap));
+    if (useSocketMap.get(userId) === socket.id) {
+      useSocketMap.delete(userId);
+      console.log("Bro just rage quit", socket.id);
+      io.emit("getOnlineUsers", [...useSocketMap.keys()]);
+    }
   });
 });
 
