@@ -15,6 +15,7 @@ const SideBar = () => {
     : users;
 
   useEffect(() => {
+    console.log(filteredUsers);
     getUsers();
   }, [getUsers]);
 
@@ -45,7 +46,7 @@ const SideBar = () => {
       </div>
 
       <div className="overflow-y-auto w-full py-3">
-        {filteredUsers.length > 0 &&
+        {filteredUsers && filteredUsers?.length > 0 ? (
           filteredUsers.map((user) => (
             <button
               key={user._id}
@@ -81,7 +82,10 @@ const SideBar = () => {
                 </div>
               </div>
             </button>
-          ))}
+          ))
+        ) : (
+          <h2>No online users</h2>
+        )}
 
         {filteredUsers.length === 0 && (
           <div className="text-center text-zinc-500 py-4">No online users</div>
