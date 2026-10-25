@@ -3,86 +3,77 @@ import { axiosInstance } from "../Utils/axios";
 import toast from "react-hot-toast";
 import useAuthStore from "./auth-store";
 
-
-
-
 const useChatStore = create((set, get) => ({
-    messages: [],
-    users: [],
-    selectedUser: null,
-    isUserLoading: false,
-    isMessage: false,
+  messages: [],
+  users: [],
+  selectedUser: null,
+  isUserLoading: false,
+  isMessage: false,
 
-    getUsers: async () => {
+  getUsers: async () => {
+    set({ isUserLoading: true });
+    try {
+      const response = await axiosInstance.get("/messages/users");
+      set({ users: response.data });
+    } catch (error) {
+      console.error("ERROR getUsers", error.e.response.data);
+      toast.error("Something went wrong while fecthing users");
+    } finally {
+      set({ isUserLoading: false });
+    }
+  },
 
-        set({isUserLoading: true})
-        try {
+  getMessages: async (id) => {
+    set({ isMessage: true });
 
-            const response = await axiosInstance.get('/messages/users');
-            set({users: response.data})
-            
-        } catch (error) {
-            console.error("ERROR getUsers", error.e.response.data)
-            toast.error('Something went wrong while fecthing users')
-        } finally {
-            set({isUserLoading: false})
-        }
-        
-    }, 
-    
-    getMessages: async (id) => {
+    try {
+      const respone = await axiosInstance.get(`/messages/${id}`);
+      set({ messages: respone.data });
+    } catch (error) {
+      console.error("ERROR getMessages", error.message);
+      toast.error("Something went wrong while fecthing messages");
+    } finally {
+      set({ isMessage: false });
+    }
+  },
 
-        set({isMessage: true})
+  SendMessage: async (data) => {
+    const { selectedUser, messages } = get();
 
-        try {
+    try {
+      const respone = await axiosInstance.post(
+        `/messages/send/${selectedUser._id}`,
+        data,
+      );
+      set({ messages: [...messages, respone.data] });
+    } catch (error) {
+      console.error("ERROR sending msg:", error.message);
+      toast.error("Something went wrong while sending MSG");
+    }
+  },
 
-            const respone = await axiosInstance.get(`/messages/${id}`)
-            set({messages: respone.data})
-            
-        } catch (error) {
-            console.error("ERROR getMessages", error.message)
-            toast.error("Something went wrong while fecthing messages")
-        } finally {
-            set({isMessage: false})
-        }
-    },
+  ListenMessage: () => {
+    const { selectedUser } = get();
 
-    SendMessage: async (data) => {
+    if (!selectedUser) return;
 
-        const {selectedUser, messages} = get()
+    const socket = useAuthStore.getState().socket;
 
+    socket.on("newMessage", (newMessage) => {
+      if (newMessage.senderId !== selectedUser._id) return;
+      set((state) => ({
+        messages: [...state.messages, newMessage],
+      }));
+    });
+  },
 
-        try {
-            const respone = await axiosInstance.post(`/messages/send/${selectedUser._id}`, data)
-            set({messages: [...messages, respone.data]})
-        } catch (error) {
+  StopListenMessage: () => {
+    const socket = useAuthStore.getState().socket;
 
-            console.error("ERROR sending msg:", error.message)
-            toast.error("Something went wrong while sending MSG")
-        }
-    },
+    socket.off("newMessage");
+  },
 
-    ListenMessage: () => {
-        const {selectedUser} = get()
-
-        if(!selectedUser) return;   
-
-        const socket = useAuthStore.getState().socket
-
-
-        socket.on("newMessage", (newMessage) => {
-            if(newMessage.senderId !== selectedUser._id) return;
-            set({messages: [...get().messages, newMessage],})
-        })
-    },
-
-    StopListenMessage: () => {
-        const socket = useAuthStore.getState().socket
-
-        socket.off("newMessage")
-    },
-
-    setSelectedUser: (user) => set({selectedUser: user})
+  setSelectedUser: (user) => set({ selectedUser: user }),
 }));
 
 export default useChatStore;
