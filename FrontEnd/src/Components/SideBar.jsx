@@ -15,7 +15,6 @@ const SideBar = () => {
     : users;
 
   useEffect(() => {
-    console.log(filteredUsers);
     getUsers();
   }, [getUsers]);
 
