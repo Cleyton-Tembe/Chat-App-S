@@ -1,38 +1,42 @@
-import { useEffect, useRef } from "react"
-import useChatStore from "../Store/useChatStore"
-import MessageSkeleton from "./Skeletons/MessageSkeleton"
-import ChatHeader from "./ChatHeader"
-import MessageInput from "./MessageInput"
-import useAuthStore from "../Store/auth-store"
-import { FormatMessageTime } from "../Utils/FormatTime"
-
+import { useEffect, useRef } from "react";
+import useChatStore from "../Store/useChatStore";
+import MessageSkeleton from "./Skeletons/MessageSkeleton";
+import ChatHeader from "./ChatHeader";
+import MessageInput from "./MessageInput";
+import useAuthStore from "../Store/auth-store";
+import { FormatMessageTime } from "../Utils/FormatTime";
 
 const ChatContainer = () => {
+  const bottomMessage = useRef(null);
+  const {
+    messages,
+    getMessages,
+    isMessage,
+    selectedUser,
+    ListenMessage,
+    StopListenMessage,
+  } = useChatStore();
+  const { authUser } = useAuthStore();
+  console.log(authUser);
 
+  console.log("authUser.profilePic:", authUser.profilePic);
+  console.log("selectedUser.profilePic:", selectedUser);
 
-    const bottomMessage = useRef(null)
-    const {messages, getMessages, isMessage, selectedUser, ListenMessage, StopListenMessage} = useChatStore()
-    const { authUser } = useAuthStore()
-    console.log(authUser)
+  useEffect(() => {
+    getMessages(selectedUser._id);
+    ListenMessage();
 
-    console.log("authUser.profilePic:", authUser.profilePic);
-console.log("selectedUser.profilePic:", selectedUser);
+    return () => StopListenMessage();
+  }, [selectedUser._id, getMessages, ListenMessage, StopListenMessage]);
 
-    useEffect(()=> {
-        getMessages(selectedUser._id)
-        ListenMessage()
+  useEffect(() => {
+    if (bottomMessage.current && messages) {
+      bottomMessage.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
-        return () => StopListenMessage()
-    }, [selectedUser._id, getMessages, ListenMessage, StopListenMessage])
+  if (isMessage) return <MessageSkeleton />;
 
-    useEffect(()=>{
-      if(bottomMessage.current && messages) {
-        bottomMessage.current.scrollIntoView({behavior: "smooth"})
-      }
-    }, [messages])
-
-    if(isMessage) return <MessageSkeleton />
-    
   return (
     <div className="flex-1 flex flex-col overflow-auto relative">
       <ChatHeader />
@@ -44,12 +48,15 @@ console.log("selectedUser.profilePic:", selectedUser);
               className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}
               ref={bottomMessage}
             >
-
               <div className="chat-image avatar">
                 <div className="size-10 rounded-full border">
-                  <img 
-                    src={message.senderId === authUser._id  ? authUser.profilePic.trim() || "/avatar.png" : selectedUser.profilePic.trim() || "/avatar.png"} 
-                    alt="user-image" 
+                  <img
+                    src={
+                      message.senderId === authUser._id
+                        ? authUser.profilePic.trim() || "/avatar.png"
+                        : selectedUser.profilePic.trim() || "/avatar.png"
+                    }
+                    alt="user-image"
                   />
                 </div>
               </div>
@@ -61,21 +68,21 @@ console.log("selectedUser.profilePic:", selectedUser);
 
               <div className="chat-bubble flex flex-col gap-0.5">
                 {message.image && (
-                  <img 
-                    src={message.image} 
+                  <img
+                    src={message.image}
                     alt="image"
-                    className="sm:max-w-[200px] rounded-md mb-2 min-w-96" 
+                    className="sm:max-w-[200px] rounded-md mb-2 min-w-96"
                   />
                 )}
                 {message.text && <p>{message.text}</p>}
               </div>
             </div>
-          )
+          );
         })}
       </div>
-      <MessageInput/>
+      <MessageInput />
     </div>
-  )
-}
+  );
+};
 
-export default ChatContainer
+export default ChatContainer;

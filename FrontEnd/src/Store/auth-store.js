@@ -4,7 +4,9 @@ import { axiosInstance } from "../Utils/axios";
 import toast from "react-hot-toast";
 
 const BASE_URL =
-  import.meta.env.NODE_ENV === "development" ? "http://localhost:4000" : "/";
+  import.meta.env.VITE_NODE_ENV === "development"
+    ? "http://localhost:4000"
+    : "/";
 
 const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -104,7 +106,11 @@ const useAuthStore = create((set, get) => ({
         userId: authUser._id,
       },
     });
+
+    console.log(BASE_URL);
     socket.connect();
+
+    console.log("socket", socket.connected);
 
     set({ socket: socket });
 
