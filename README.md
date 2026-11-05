@@ -6,7 +6,7 @@ Aplicação de chat em tempo real com autenticação, envio de imagens, utilizad
 
 ## Demo
 
-🔗 **[Ver demo](COLOCA_AQUI_O_LINK_DA_DEMO)**
+🔗 **[Ver demo](https://chat-app-s-1.onrender.com)**
 
 ## Funcionalidades
 
