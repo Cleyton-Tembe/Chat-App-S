@@ -54,14 +54,15 @@ const useChatStore = create((set, get) => ({
 
   ListenMessage: () => {
     const { selectedUser } = get();
-
     if (!selectedUser) return;
 
     const socket = useAuthStore.getState().socket;
-    console.log("chat socket", socket);
+    if (!socket) return; // socket not connected yet
+
+    socket.off("newMessage");
 
     socket.on("newMessage", (newMessage) => {
-      if (newMessage.senderId !== selectedUser._id) return;
+      if (String(newMessage.senderId) !== String(selectedUser._id)) return;
       set((state) => ({
         messages: [...state.messages, newMessage],
       }));
@@ -70,7 +71,7 @@ const useChatStore = create((set, get) => ({
 
   StopListenMessage: () => {
     const socket = useAuthStore.getState().socket;
-
+    if (!socket) return;
     socket.off("newMessage");
   },
 
